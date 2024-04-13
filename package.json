@@ -1,6 +1,6 @@
 {
-  "name": "serverless-offline-multi",
-  "version": "1.0.1",
+  "name": "sls-offline-multi",
+  "version": "0.0.1",
   "description": "A wrapper for serverless-offline that allows multiple instances to be ran concurrently with watch functionality",
   "main": "./lib/index.js",
   "scripts": {
@@ -8,15 +8,13 @@
   },
   "author": "isitgeorge",
   "bin": {
-    "serverless-offline-multi": "./bin/multi.js"
+    "sls-offline-multi": "./bin/multi.js"
   },
   "license": "MIT",
   "dependencies": {
     "concurrently": "5.1.0",
-    "get-installed-path": "4.0.8",
-    "lodash": "^4.17.20",
-    "minimist": "1.2.5",
-    "nodemon": "2.0.3"
+    "js-yaml": "^4.1.0",
+    "nodemon": "^2.0.22"
   },
   "keywords": [
     "serverless",
@@ -27,6 +25,6 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/isitgeorge/serverless-offline-multi.git"
+    "url": "https://github.com/ebtrexler/sls-offline-multi"
   }
 }
