@@ -1,48 +1,62 @@
 #!/usr/bin/env node
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const js_yaml_1 = __importDefault(require("js-yaml"));
-const fs_1 = __importDefault(require("fs"));
-const concurrently_1 = __importDefault(require("concurrently"));
-const helpers_1 = require("./helpers");
+
+import yaml from 'js-yaml';
+import fs from 'fs';
+
+import concurrently from "concurrently";
+import { prefixColors } from "./helpers";
+
 exports.start = function () {
+
     try {
-        const doc = js_yaml_1.default.load(fs_1.default.readFileSync(`${process.cwd()}/sls-offline-multi-compose.yml`, 'utf8'));
+        const doc = yaml.load(fs.readFileSync(`${process.cwd()}/sls-offline-multi-compose.yml`, 'utf8'));
+
         let serviceCommands = [];
+
         const services = doc['services'];
         const stage = doc['stage'] || "local";
+
         var colorIdx = 0;
+
         for (const serviceName in services) {
             const svc = services[serviceName];
+
             //TODO: need some error checking here
+
             serviceCommands.push({
                 command: buildCommand(stage, svc.path, svc.port, svc.watch || false),
                 name: serviceName,
-                prefixColor: helpers_1.prefixColors[colorIdx % helpers_1.prefixColors.length],
+                prefixColor: prefixColors[colorIdx % prefixColors.length],
             });
+
             colorIdx++;
         }
-        (0, concurrently_1.default)(serviceCommands, {
+
+        concurrently(serviceCommands, {
             prefix: "name",
             killOthers: ["failure", "success"],
             restartTries: 3,
-        }).then(() => {
-            // success
-        }, () => {
-            // failure
-        });
+        }).then(
+            () => {
+                // success
+            },
+            () => {
+                // failure
+            }
+        );
     }
-    catch (e) {
+
+    catch (e: any) {
         console.error(e.message);
     }
+
 };
-function buildCommand(stage, directory, port, watch) {
+
+function buildCommand(stage: string, directory: string, port: number, watch: boolean) {
     const installedPath = `${__dirname}/../node_modules`;
+
     if (watch) {
-        console.log(`watching ${directory}`);
+        console.log(`watching ${directory}`)
         return `cd ${process.cwd()}/${directory} && nodemon -V --exec "serverless offline start --stage ${stage} --httpPort ${port} --lambdaPort ${Number(port) + 1000}" --watch ${process.cwd()}/${directory} -e ts,js,yml`;
     }
     return `cd ${process.cwd()}/${directory} && serverless offline start --stage ${stage} --httpPort ${port} --lambdaPort ${Number(port) + 1000}`;
